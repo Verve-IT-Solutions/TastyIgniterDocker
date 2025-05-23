@@ -1,19 +1,19 @@
 # TastyIgniter Docker
-[![Docker Pulls](https://img.shields.io/docker/pulls/thisisqasim/tastyigniter)](https://hub.docker.com/r/thisisqasim/tastyigniter/)
-[![Docker Image Size (tag)](https://img.shields.io/docker/image-size/thisisqasim/tastyigniter/latest)](https://hub.docker.com/r/thisisqasim/tastyigniter/tags)
 
 Run with docker compose for automatic database configuration
 
+```sh
+git clone https://github.com/Verve-IT-Solutions/TastyIgniterDocker.git
+cd TastyIgniterDocker
 ```
-mkdir tastyigniter && cd tastyigniter
-curl -LO https://github.com/ThisIsQasim/TastyIgniter/raw/master/docker-compose.yml
+change the needed settings in the docker-compose using `nano docker-compose.yml`
+```sh
 docker compose up db -d
 sleep 10
-docker compose up -d
-docker compose exec app php artisan igniter:passwd admin
+docker compose up --build -d
 ```
-    
-Browse to port 8001 of your docker host. The TastyIgniter setup wizard will show up. Wait for a minute for the database container to come up and then run the setup. 
+
+Browse to port 8001 of your docker host. Use the `/admin` page to set up the admin and insert the general info
 
 ## Credits
 TastyIgniter: https://github.com/tastyigniter/TastyIgniter

@@ -1,31 +1,38 @@
-version: '2'
+version: '3.8'
+
 services:
   app:
-    image: thisisqasim/tastyigniter:3.4.0
+    build: .  # Build from local Dockerfile
     hostname: tasty
     ports:
       - 8001:80
     environment:
-      - APP_URL=https://tasty.example.com
+      - APP_ENV=production
+      - APP_URL=http://127.0.0.1:8001   #CHANGEME
+                                        # Replace with your server's public IP address
       - DB_CONNECTION=mysql
       - DB_HOST=db
       - DB_DATABASE=tastyigniter
       - DB_USERNAME=tastyigniter
-      - DB_PASSWORD=somepassword
+      - DB_PASSWORD=securefassword      #CHANGEME
+                                        # Replace with your database password
       - CACHE_DRIVER=redis
       - REDIS_HOST=redis
-    restart: always  
+    restart: always
   db:
-    image: mariadb:10.7
+    image: mariadb:10.11
     volumes:
       - ./db:/var/lib/mysql
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
       - MYSQL_DATABASE=tastyigniter
       - MYSQL_USER=tastyigniter
-      - MYSQL_PASSWORD=somepassword
+      - MYSQL_PASSWORD=securefassword   #CHANGEME
+                                        # Replace with your database password
+                                        # Has to be the same as in the app service
     restart: always
+
   redis:
-    image: redis:6
+    image: redis:7
     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
     restart: always
