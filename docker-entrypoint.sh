@@ -82,6 +82,19 @@ echo '    Require all granted' >> /etc/apache2/conf-available/public-dir.conf
 echo '</Directory>' >> /etc/apache2/conf-available/public-dir.conf
 a2enconf public-dir
 
+# Create media directories only if they don't exist
+MEDIA_DIRS=(
+    "/var/www/html/storage/app/public/media/uploads"
+    "/var/www/html/storage/app/public/media/attachments"
+)
+
+for dir in "${MEDIA_DIRS[@]}"; do
+    if [ ! -d "$dir" ]; then
+        echo "Creating media directory: $dir"
+        mkdir -p "$dir"
+    fi
+done
+
 # Make storage directory writable during runtime
 chmod -R 777 /var/www/html/storage
 chmod -R 777 /var/www/html/bootstrap/cache
