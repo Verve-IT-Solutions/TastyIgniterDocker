@@ -38,7 +38,7 @@ RUN a2enmod rewrite
 RUN echo "ServerName tasty" > /etc/apache2/conf-available/servername.conf && \
     a2enconf servername
 
-ENV TASTYIGNITER_VERSION 4.0.0
+ENV TASTYIGNITER_VERSION 4.0.1
 
 RUN set -ex; \
     curl -o tastyigniter.zip -fSL "https://codeload.github.com/tastyigniter/TastyIgniter/zip/v${TASTYIGNITER_VERSION}"; \
