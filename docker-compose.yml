@@ -6,6 +6,8 @@ services:
     hostname: tasty
     ports:
       - 8001:80
+    volumes:
+      - ./media:/var/www/persistent-media:rw
     environment:
       - APP_ENV=production
       - APP_URL=http://127.0.0.1:8001   #CHANGEME
