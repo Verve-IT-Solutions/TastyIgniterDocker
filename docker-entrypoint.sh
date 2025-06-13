@@ -1,16 +1,17 @@
 #!/bin/bash
-# filepath: docker-entrypoint.sh
 set -e
 
 echo "Starting TastyIgniter entrypoint script..."
 
+# First-run application setup
 if [ ! -f '/var/www/html/public/index.php' ]; then
-    echo "Setting up TastyIgniter application..."
+    echo "Setting up TastyIgniter application... (first start)"
 
-    # Clear existing files
+    # Clear existing files EXCEPT the persistent media volume
+    # (now safe because media is mounted at different location)
     rm -rf /var/www/html/*
 
-    # Copy application files to web root
+    # Copy application files
     cp -a /usr/src/tastyigniter/. /var/www/html/
 
     # Create .env file with proper values
@@ -82,10 +83,25 @@ echo '    Require all granted' >> /etc/apache2/conf-available/public-dir.conf
 echo '</Directory>' >> /etc/apache2/conf-available/public-dir.conf
 a2enconf public-dir
 
-# Create media directories only if they don't exist
+# ================== PERSISTENT MEDIA SETUP ==================
+# (Runs on EVERY startup)
+echo "Configuring persistent media storage..."
+
+# 1. Create symlink from app location to persistent volume
+#    - Remove if exists as directory (first run after migration)
+#    - Skip if already a symlink
+mkdir -p /var/www/html/storage/app/public
+if [ -d "/var/www/html/storage/app/public/media" ]; then
+    rm -rf /var/www/html/storage/app/public/media
+fi
+if [ ! -L "/var/www/html/storage/app/public/media" ]; then
+    ln -sf /var/www/persistent-media /var/www/html/storage/app/public/media
+fi
+
+# 2. Create required media directories in PERSISTENT location
 MEDIA_DIRS=(
-    "/var/www/html/storage/app/public/media/uploads"
-    "/var/www/html/storage/app/public/media/attachments"
+    "/var/www/persistent-media/uploads"
+    "/var/www/persistent-media/attachments"
 )
 
 for dir in "${MEDIA_DIRS[@]}"; do
@@ -93,7 +109,10 @@ for dir in "${MEDIA_DIRS[@]}"; do
         echo "Creating media directory: $dir"
         mkdir -p "$dir"
     fi
+    chown www-data:www-data "$dir"
+    chmod 777 "$dir"
 done
+# ================== END PERSISTENT MEDIA SETUP ==================
 
 # Make storage directory writable during runtime
 chmod -R 777 /var/www/html/storage
